@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { GetUserProfileUseCase } from './getUserProfile';
-import { InMemoryUsersRepository } from '@/repositories/in-memory/inMemoryUsersRepositoriy';
+import { InMemoryUsersRepository } from '@/repositories/in-memory/inMemoryUsersRepository';
 import { hash } from 'bcryptjs';
 import { ResourceNotFoundError } from './errors/resourceNotFoundError';
 
@@ -14,14 +14,14 @@ describe('Get user profile Use Case', () => {
     });
 
     it('should be able to get user profile', async () => {
-        const creeatedUser = await usersRepository.create({
+        const createdUser = await usersRepository.create({
             name: 'Jonh Doe',
             email: 'jonhdoe@email.com',
             password_hash: await hash('123456', 6),
         });
 
         const { user } = await sut.handle({
-            userId: creeatedUser.id,
+            userId: createdUser.id,
         });
 
         expect(user.id).toEqual(expect.any(String));
