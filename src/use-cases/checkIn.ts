@@ -2,7 +2,9 @@ import { CheckInsRepository } from '@/repositories/checkInsRepository';
 import { GymsRepository } from '@/repositories/gymsRepository';
 import { CheckIn } from '@prisma/client';
 import { ResourceNotFoundError } from './errors/resourceNotFoundError';
-import { getDistanceBetweenCoordinate } from '@/repositories/utils/getDistanceBetweenCoordinates';
+import { getDistanceBetweenCoordinates } from '@/utils/getDistanceBetweenCoordinates';
+import { MaxDistanceError } from './errors/maxDistanceError';
+import { MaxNumberOfCheckInsError } from './errors/maxNumberOfCheckInsError';
 
 interface CheckInUseCaseRequest {
     userId: string;
@@ -18,7 +20,7 @@ interface CheckInUseCaseResponse {
 export class CheckInUseCase {
     constructor(
         private checkInsRepository: CheckInsRepository,
-        private gymsRepositoy: GymsRepository
+        private gymsRepository: GymsRepository
     ) {}
 
     async handle({
@@ -27,17 +29,15 @@ export class CheckInUseCase {
         userLatitude,
         userLongitude,
     }: CheckInUseCaseRequest): Promise<CheckInUseCaseResponse> {
-        const gym = await this.gymsRepositoy.findById(gymId);
+        const gym = await this.gymsRepository.findById(gymId);
+        console.log(gym);
 
         if (!gym) {
             throw new ResourceNotFoundError();
         }
 
-        const distance = getDistanceBetweenCoordinate(
-            {
-                latitude: userLatitude,
-                longitude: userLongitude,
-            },
+        const distance = getDistanceBetweenCoordinates(
+            { latitude: userLatitude, longitude: userLongitude },
             {
                 latitude: gym.latitude.toNumber(),
                 longitude: gym.longitude.toNumber(),
@@ -47,7 +47,7 @@ export class CheckInUseCase {
         const MAX_DISTANCE_IN_KILOMETERS = 0.1;
 
         if (distance > MAX_DISTANCE_IN_KILOMETERS) {
-            throw new Error();
+            throw new MaxDistanceError();
         }
 
         const checkInOnSameDay =
@@ -57,12 +57,12 @@ export class CheckInUseCase {
             );
 
         if (checkInOnSameDay) {
-            throw new Error();
+            throw new MaxNumberOfCheckInsError();
         }
 
         const checkIn = await this.checkInsRepository.create({
-            user_id: userId,
             gym_id: gymId,
+            user_id: userId,
         });
 
         return {

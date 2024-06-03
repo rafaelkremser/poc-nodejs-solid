@@ -10,4 +10,12 @@ export class PrismaCheckInsRepository implements CheckInsRepository {
 
         return checkIn;
     }
+
+    async findByUserIdOnDate(userId: string, date: Date) {
+        const user = await prisma.user.findUnique({
+            where: { email },
+        });
+
+        return user;
+    }
 }
