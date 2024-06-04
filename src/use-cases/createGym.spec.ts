@@ -1,18 +1,17 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { CreateGymUseCase } from './createGym';
 import { InMemoryGymsRepository } from '@/repositories/in-memory/inMemoryGymsRepository';
-import { Decimal } from '@prisma/client/runtime/library';
 
 let gymsRepository: InMemoryGymsRepository;
 let sut: CreateGymUseCase;
 
-describe('Create Use Case', () => {
+describe('Create Gym Use Case', () => {
     beforeEach(() => {
         gymsRepository = new InMemoryGymsRepository();
         sut = new CreateGymUseCase(gymsRepository);
     });
 
-    it('should be able to crate a gym', async () => {
+    it('should be able to create a gym', async () => {
         const { gym } = await sut.handle({
             title: 'javascript gym',
             description: null,
