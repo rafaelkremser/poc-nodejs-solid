@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { InMemoryCheckInsRepository } from '@/repositories/in-memory/inMemoryCheckInsRepository';
-import { GetUserMetrics } from './getUserMetrics';
+import { InMemoryCheckInsRepository } from '@/repositories/inMemory/inMemoryCheckInsRepository';
+import { GetUserMetricsUseCase } from './getUserMetrics';
 
 let checkInsRepository: InMemoryCheckInsRepository;
-let sut: GetUserMetrics;
+let sut: GetUserMetricsUseCase;
 
 describe('Ger User Metrics Use Case', () => {
     beforeEach(async () => {
         checkInsRepository = new InMemoryCheckInsRepository();
-        sut = new GetUserMetrics(checkInsRepository);
+        sut = new GetUserMetricsUseCase(checkInsRepository);
     });
 
     it('should be able to get check-ins count from metrics', async () => {
