@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { InMemoryCheckInsRepository } from '@/repositories/inMemory/inMemoryCheckInsRepository';
-import { FetchUserCheckInsHistory } from './fetchUserCheckInsHistory';
+import { FetchUserCheckInsHistoryUseCase } from './fetchUserCheckInsHistory';
 
 let checkInsRepository: InMemoryCheckInsRepository;
-let sut: FetchUserCheckInsHistory;
+let sut: FetchUserCheckInsHistoryUseCase;
 
 describe('Fetch User Check-in History Use Case', () => {
     beforeEach(async () => {
         checkInsRepository = new InMemoryCheckInsRepository();
-        sut = new FetchUserCheckInsHistory(checkInsRepository);
+        sut = new FetchUserCheckInsHistoryUseCase(checkInsRepository);
 
         vi.useFakeTimers();
     });
