@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { InvalidCredentialsError } from '@/use-cases/errors/invalidCredentialsError';
 import { makeAuthenticateUseCase } from '@/use-cases/factories/makeAuthenticateUseCase';
 
-export async function authenticateUser(
+export async function authenticate(
     request: FastifyRequest,
     reply: FastifyReply
 ) {
@@ -20,7 +20,9 @@ export async function authenticateUser(
         const { user } = await authenticateUseCase.handle({ email, password });
 
         const token = await reply.jwtSign(
-            {},
+            {
+                role: user.role,
+            },
             {
                 sign: {
                     sub: user.id,
@@ -28,7 +30,26 @@ export async function authenticateUser(
             }
         );
 
-        return reply.status(200).send({ token });
+        const refreshToken = await reply.jwtSign(
+            {
+                role: user.role,
+            },
+            {
+                sign: {
+                    sub: user.id,
+                    expiresIn: '7d',
+                },
+            }
+        );
+
+        return reply
+            .status(200)
+            .setCookie('refreshToken', refreshToken, {
+                path: '/',
+                secure: true,
+                httpOnly: true,
+            })
+            .send({ token });
     } catch (err) {
         if (err instanceof InvalidCredentialsError) {
             return reply.status(400).send({ message: err.message });
